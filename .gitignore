@@ -1,2 +1,10 @@
 
 /generated/prisma
+node_modules/
+.env
+dist/
+*.log
+.DS_Store
+
+prisma/*.db
+prisma/*.db-journal
