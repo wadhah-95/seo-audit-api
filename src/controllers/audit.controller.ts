@@ -3,8 +3,8 @@ import { normalizeUrl } from "../utils/url.util";
 export function createAuditController(req: Request, res: Response) {
   try {
     const url = normalizeUrl(req.body.url);
-    console.log("normalized url: ", url);
-    console.log("Raw url: ", req.body.url);
+    //console.log("normalized url: ", url);
+    //console.log("Raw url: ", req.body.url);
 
     res.status(201).json({
       message: "Audit created successfully",
