@@ -1,15 +1,33 @@
 import type {Request, Response} from "express";
+import { normalizeUrl } from "../utils/url.util";
+export function createAuditController(req: Request, res: Response) {
+  try {
+    const url = normalizeUrl(req.body.url);
+    console.log("normalized url: ", url);
+    console.log("Raw url: ", req.body.url);
 
-export function createAuditController(req: Request, res: Response){
-  const url=req.body.url;
-  res.status(201).json({
-    message: "Audit created successfully",
-    audit: {
-      id: "fake_audit-id",
-      url,
-      score: 85
-    },
-  });
+    res.status(201).json({
+      message: "Audit created successfully",
+      audit: {
+        id: "fake-audit-id",
+        url,
+        score: 85,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: "Could not create audit",
+        error: error.message,
+      });
+      return;
+    }
+
+    res.status(400).json({
+      message: "Could not create audit",
+      error: "Unknown error",
+    });
+  }
 }
 
 export function getAuditsController(_req: Request, res: Response){
@@ -43,8 +61,8 @@ export function getAuditByIdController(req: Request, res: Response){
       id,
       score: 85,
       url: "https://example.com",
-    }
-  })
+    },
+  });
 }
 
 
