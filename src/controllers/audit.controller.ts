@@ -1,18 +1,14 @@
 import type {Request, Response} from "express";
-import { normalizeUrl } from "../utils/url.util";
+import { createAudit } from "../services/audit.servise";
 export function createAuditController(req: Request, res: Response) {
   try {
-    const url = normalizeUrl(req.body.url);
+    const audit=createAudit(req.body.url)
     //console.log("normalized url: ", url);
     //console.log("Raw url: ", req.body.url);
 
     res.status(201).json({
       message: "Audit created successfully",
-      audit: {
-        id: "fake-audit-id",
-        url,
-        score: 85,
-      },
+      audit,
     });
   } catch (error) {
     if (error instanceof Error) {
