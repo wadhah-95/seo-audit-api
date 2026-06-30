@@ -1,8 +1,8 @@
 import type {Request, Response} from "express";
 import { createAudit } from "../services/audit.servise";
-export function createAuditController(req: Request, res: Response) {
+export async function createAuditController(req: Request, res: Response) {
   try {
-    const audit=createAudit(req.body.url)
+    const audit=await createAudit(req.body.url)
     //console.log("normalized url: ", url);
     //console.log("Raw url: ", req.body.url);
 
