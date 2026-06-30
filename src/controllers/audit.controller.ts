@@ -2,7 +2,7 @@ import type {Request, Response} from "express";
 import { createAudit } from "../services/audit.service";
 
 export async function createAuditController(req: Request, res: Response) {
-  console.log("CREATE AUDIT CONTROLLER IS RUNNING");
+  //console.log("CREATE AUDIT CONTROLLER IS RUNNING");
   try {
     const audit=await createAudit(req.body.url)
     //console.log("normalized url: ", url);
