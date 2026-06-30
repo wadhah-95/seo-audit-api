@@ -1,10 +1,13 @@
 import type {Request, Response} from "express";
-import { createAudit } from "../services/audit.servise";
+import { createAudit } from "../services/audit.service";
+
 export async function createAuditController(req: Request, res: Response) {
+  console.log("CREATE AUDIT CONTROLLER IS RUNNING");
   try {
     const audit=await createAudit(req.body.url)
     //console.log("normalized url: ", url);
     //console.log("Raw url: ", req.body.url);
+    
 
     res.status(201).json({
       message: "Audit created successfully",
