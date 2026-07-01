@@ -28,7 +28,7 @@ export async function createAudit(rawUrl: string){
 
 export async function getAllAudits(){
   const audits=await prisma.audit.findMany({
-    orderBy: {createdAt: 'desc'},
+    orderBy: {createdAt: 'asc'},
   });
   return audits;
 }

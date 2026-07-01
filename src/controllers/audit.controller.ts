@@ -12,21 +12,24 @@ export async function createAuditController(req: Request, res: Response) {
     
 
     res.status(201).json({
+      success: true,
       message: "Audit created successfully",
-      audit,
+      data: {audit},
     });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({
+        success: false,
         message: "Could not create audit",
-        error: error.message,
+        error: {code: "AUDIT_CREATE_FAILED", details: error.message},
       });
       return;
     }
 
     res.status(400).json({
+      success: false,
       message: "Could not create audit",
-      error: "Unknown error",
+      error: {code: "AUDIT_CREATE_FAILED", details: "Error unknown"},
     });
   }
 }
@@ -35,22 +38,25 @@ export async function getAuditsController(_req: Request, res: Response){
   try{
   const audits=await getAllAudits();
   res.status(200).json({
+    success: true,
     message: "Audits fetched successfully",
-    audits,
+    data: {audits},
   });
   }
   catch(error){
     if(error instanceof Error){
       res.status(500).json({
+        success: false,
         message: "Could not fetch Audits",
-        error: error.message,
+        error: {code: "AUDITS_FETCH_FAILED", details: error.message},
       });
       return;
 
     }
     res.status(500).json({
+      success: false,
       message: "Could not fetch Audits",
-      error: "Error unknown",
+      error: {code: "AUDITS_FETCH_FAILED", details: "Error unknown"},
     });
   }
 }
@@ -62,24 +68,30 @@ export async function getAuditByIdController(req: Request, res: Response){
     const audit=await getAuditById(id);
     if(audit===null){
       res.status(200).json({
+        success: false,
         message: "Audit not in database",
+        error: {code: "AUDIT_NOT_FOUND"},
       });
     }
     res.status(200).json({
+      success: true,
       message: "Audit fetched successfully",
-      audit,
+      data: {audit},
     });
   }
   catch(error){
     if(error instanceof Error){
       res.status(500).json({
+        success: false, 
         message: "Could not fetch audit ",
-        error: error.message,
+        error: {code: "INVALID_AUDIT_ID", details: error.message},
       });
+      return;
     }
     res.status(500).json({
+      success: false,
       message: "Could not fetch audit",
-      error: "Error unknown",
+      error: {code: "INVALID_AUDIT_ID", details: "Error unknown"},
     });
   }
 }
