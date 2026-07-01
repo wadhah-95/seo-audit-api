@@ -5,12 +5,14 @@ import {generateRecommendations} from "./recommendation.service";
 import { calculateScore } from "./scoring.service";
 import { AuditScalarFieldEnum } from "../generated/prisma/internal/prismaNamespace";
 import prisma from "../lib/prisma";
+import { SiteFilesResult, checkSiteFiles } from "./site-files.service";
 
 export async function createAudit(rawUrl: string){
   let normalizedUrl=normalizeUrl(rawUrl);
+  const siteFiles=await checkSiteFiles(normalizedUrl);
   const fetchedPage=await fetchHtml(normalizedUrl);
   const analysis=analyzeSeo(fetchedPage.html);
-  const recommendations=generateRecommendations(analysis);
+  const recommendations=generateRecommendations(analysis, siteFiles);
   const score=calculateScore(recommendations);
   //console.log("NEW createAudit service is running");
   const savedAudit=await prisma.audit.create({
@@ -21,6 +23,7 @@ export async function createAudit(rawUrl: string){
     statusCode: fetchedPage.statusCode,
     analysis,
     recommendations,
+    siteFiles,
   }
   })
   return savedAudit;

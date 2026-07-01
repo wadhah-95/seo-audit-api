@@ -67,6 +67,7 @@ export type AuditCountAggregateOutputType = {
   analysis: number
   recommendations: number
   createdAt: number
+  siteFiles: number
   _all: number
 }
 
@@ -112,6 +113,7 @@ export type AuditCountAggregateInputType = {
   analysis?: true
   recommendations?: true
   createdAt?: true
+  siteFiles?: true
   _all?: true
 }
 
@@ -210,6 +212,7 @@ export type AuditGroupByOutputType = {
   analysis: runtime.JsonValue
   recommendations: runtime.JsonValue
   createdAt: Date
+  siteFiles: runtime.JsonValue | null
   _count: AuditCountAggregateOutputType | null
   _avg: AuditAvgAggregateOutputType | null
   _sum: AuditSumAggregateOutputType | null
@@ -244,6 +247,7 @@ export type AuditWhereInput = {
   analysis?: Prisma.JsonFilter<"Audit">
   recommendations?: Prisma.JsonFilter<"Audit">
   createdAt?: Prisma.DateTimeFilter<"Audit"> | Date | string
+  siteFiles?: Prisma.JsonNullableFilter<"Audit">
 }
 
 export type AuditOrderByWithRelationInput = {
@@ -255,6 +259,7 @@ export type AuditOrderByWithRelationInput = {
   analysis?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  siteFiles?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type AuditWhereUniqueInput = Prisma.AtLeast<{
@@ -269,6 +274,7 @@ export type AuditWhereUniqueInput = Prisma.AtLeast<{
   analysis?: Prisma.JsonFilter<"Audit">
   recommendations?: Prisma.JsonFilter<"Audit">
   createdAt?: Prisma.DateTimeFilter<"Audit"> | Date | string
+  siteFiles?: Prisma.JsonNullableFilter<"Audit">
 }, "id">
 
 export type AuditOrderByWithAggregationInput = {
@@ -280,6 +286,7 @@ export type AuditOrderByWithAggregationInput = {
   analysis?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  siteFiles?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AuditCountOrderByAggregateInput
   _avg?: Prisma.AuditAvgOrderByAggregateInput
   _max?: Prisma.AuditMaxOrderByAggregateInput
@@ -299,6 +306,7 @@ export type AuditScalarWhereWithAggregatesInput = {
   analysis?: Prisma.JsonWithAggregatesFilter<"Audit">
   recommendations?: Prisma.JsonWithAggregatesFilter<"Audit">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Audit"> | Date | string
+  siteFiles?: Prisma.JsonNullableWithAggregatesFilter<"Audit">
 }
 
 export type AuditCreateInput = {
@@ -309,6 +317,7 @@ export type AuditCreateInput = {
   analysis: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditUncheckedCreateInput = {
@@ -320,6 +329,7 @@ export type AuditUncheckedCreateInput = {
   analysis: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditUpdateInput = {
@@ -330,6 +340,7 @@ export type AuditUpdateInput = {
   analysis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditUncheckedUpdateInput = {
@@ -341,6 +352,7 @@ export type AuditUncheckedUpdateInput = {
   analysis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditCreateManyInput = {
@@ -352,6 +364,7 @@ export type AuditCreateManyInput = {
   analysis: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditUpdateManyMutationInput = {
@@ -362,6 +375,7 @@ export type AuditUpdateManyMutationInput = {
   analysis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditUncheckedUpdateManyInput = {
@@ -373,6 +387,7 @@ export type AuditUncheckedUpdateManyInput = {
   analysis?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   recommendations?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  siteFiles?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type AuditCountOrderByAggregateInput = {
@@ -384,6 +399,7 @@ export type AuditCountOrderByAggregateInput = {
   analysis?: Prisma.SortOrder
   recommendations?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  siteFiles?: Prisma.SortOrder
 }
 
 export type AuditAvgOrderByAggregateInput = {
@@ -445,6 +461,7 @@ export type AuditSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   analysis?: boolean
   recommendations?: boolean
   createdAt?: boolean
+  siteFiles?: boolean
 }, ExtArgs["result"]["audit"]>
 
 export type AuditSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -456,6 +473,7 @@ export type AuditSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   analysis?: boolean
   recommendations?: boolean
   createdAt?: boolean
+  siteFiles?: boolean
 }, ExtArgs["result"]["audit"]>
 
 export type AuditSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -467,6 +485,7 @@ export type AuditSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   analysis?: boolean
   recommendations?: boolean
   createdAt?: boolean
+  siteFiles?: boolean
 }, ExtArgs["result"]["audit"]>
 
 export type AuditSelectScalar = {
@@ -478,9 +497,10 @@ export type AuditSelectScalar = {
   analysis?: boolean
   recommendations?: boolean
   createdAt?: boolean
+  siteFiles?: boolean
 }
 
-export type AuditOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "score" | "htmlLength" | "statusCode" | "analysis" | "recommendations" | "createdAt", ExtArgs["result"]["audit"]>
+export type AuditOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "url" | "score" | "htmlLength" | "statusCode" | "analysis" | "recommendations" | "createdAt" | "siteFiles", ExtArgs["result"]["audit"]>
 
 export type $AuditPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Audit"
@@ -494,6 +514,7 @@ export type $AuditPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     analysis: runtime.JsonValue
     recommendations: runtime.JsonValue
     createdAt: Date
+    siteFiles: runtime.JsonValue | null
   }, ExtArgs["result"]["audit"]>
   composites: {}
 }
@@ -925,6 +946,7 @@ export interface AuditFieldRefs {
   readonly analysis: Prisma.FieldRef<"Audit", 'Json'>
   readonly recommendations: Prisma.FieldRef<"Audit", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Audit", 'DateTime'>
+  readonly siteFiles: Prisma.FieldRef<"Audit", 'Json'>
 }
     
 

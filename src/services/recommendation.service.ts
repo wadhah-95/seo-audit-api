@@ -1,4 +1,5 @@
 import { SeoAnalysis } from "./seo-analyzer.service";
+import { SiteFilesResult } from "./site-files.service";
 
 export type Recommendation={
   type: string;
@@ -6,7 +7,7 @@ export type Recommendation={
   message: string;
   recommendation: string;
 };
-export function generateRecommendations(analysis: SeoAnalysis): Recommendation[]{
+export function generateRecommendations(analysis: SeoAnalysis, siteFiles: SiteFilesResult): Recommendation[]{
   const recommendations: Recommendation[]=[];
   if (analysis.hasTitle===false) {
     recommendations.push({
@@ -82,5 +83,24 @@ export function generateRecommendations(analysis: SeoAnalysis): Recommendation[]
       recommendation: "Add a viewport tag to webpage",
     });
   }
+  if (!siteFiles.robotsTxt.exists) {
+  recommendations.push({
+    type: "missing_robots_txt",
+    severity: "Low",
+    message: "The website does not expose a robots.txt file.",
+    recommendation:
+      "Add a robots.txt file to guide search engine crawlers and define crawl rules.",
+  });
+}
+
+if (!siteFiles.sitemapXml.exists) {
+  recommendations.push({
+    type: "missing_sitemap_xml",
+    severity: "Medium",
+    message: "The website does not expose a sitemap.xml file.",
+    recommendation:
+      "Add a sitemap.xml file to help search engines discover important pages.",
+  });
+}
   return recommendations;
 }

@@ -21,4 +21,5 @@ model Audit {
   analysis        Json
   recommendations Json
   createdAt       DateTime @default(now())
+  siteFiles       Json?
 }
