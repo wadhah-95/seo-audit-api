@@ -1,5 +1,7 @@
 import type {Request, Response} from "express";
-import { createAudit } from "../services/audit.service";
+import { createAudit, getAuditById } from "../services/audit.service";
+import { getAllAudits } from "../services/audit.service";
+
 
 export async function createAuditController(req: Request, res: Response) {
   //console.log("CREATE AUDIT CONTROLLER IS RUNNING");
@@ -29,39 +31,57 @@ export async function createAuditController(req: Request, res: Response) {
   }
 }
 
-export function getAuditsController(_req: Request, res: Response){
+export async function getAuditsController(_req: Request, res: Response){
+  try{
+  const audits=await getAllAudits();
   res.status(200).json({
-    audits: [
-      {
-        id: 123,
-        score: 85,
-        url: "http://example1.com",
+    message: "Audits fetched successfully",
+    audits,
+  });
+  }
+  catch(error){
+    if(error instanceof Error){
+      res.status(500).json({
+        message: "Could not fetch Audits",
+        error: error.message,
+      });
+      return;
 
-      },
-      {
-        id: 124,
-        score: 20,
-        url: "http://example2.com",
-      },
-      {
-        id: 125,
-        score: 100,
-        url: "http://example3.com",
-      }
-    ]
-  })
+    }
+    res.status(500).json({
+      message: "Could not fetch Audits",
+      error: "Error unknown",
+    });
+  }
 }
 
-export function getAuditByIdController(req: Request, res: Response){
-  const id=req.params.id;
-  res.status(200).json({
-    message: "Audit found successfully",
-    audit: {
-      id,
-      score: 85,
-      url: "https://example.com",
-    },
-  });
+
+export async function getAuditByIdController(req: Request, res: Response){
+  const id=Number(req.params.id);
+  try{
+    const audit=await getAuditById(id);
+    if(audit===null){
+      res.status(200).json({
+        message: "Audit not in database",
+      });
+    }
+    res.status(200).json({
+      message: "Audit fetched successfully",
+      audit,
+    });
+  }
+  catch(error){
+    if(error instanceof Error){
+      res.status(500).json({
+        message: "Could not fetch audit ",
+        error: error.message,
+      });
+    }
+    res.status(500).json({
+      message: "Could not fetch audit",
+      error: "Error unknown",
+    });
+  }
 }
 
 

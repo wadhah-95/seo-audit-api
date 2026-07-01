@@ -5,9 +5,20 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
+}
+
+model Audit {
+  id              Int      @id @default(autoincrement())
+  url             String
+  score           Int
+  htmlLength      Int
+  statusCode      Int
+  analysis        Json
+  recommendations Json
+  createdAt       DateTime @default(now())
 }
