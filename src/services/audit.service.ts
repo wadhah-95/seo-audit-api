@@ -11,7 +11,7 @@ export async function createAudit(rawUrl: string){
   let normalizedUrl=normalizeUrl(rawUrl);
   const siteFiles=await checkSiteFiles(normalizedUrl);
   const fetchedPage=await fetchHtml(normalizedUrl);
-  const analysis=analyzeSeo(fetchedPage.html);
+  const analysis=analyzeSeo(fetchedPage.html, normalizedUrl);
   const recommendations=generateRecommendations(analysis, siteFiles);
   const score=calculateScore(recommendations);
   //console.log("NEW createAudit service is running");

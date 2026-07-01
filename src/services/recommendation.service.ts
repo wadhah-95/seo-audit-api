@@ -102,5 +102,53 @@ if (!siteFiles.sitemapXml.exists) {
       "Add a sitemap.xml file to help search engines discover important pages.",
   });
 }
+if(analysis.totalLinks===0){
+  recommendations.push({
+    type: "missing_links",
+    severity: "Medium",
+    message: "No links found in webpage !",
+    recommendation: "Add useful internal links to help users and search engines discover related pages."
+  });
+}
+
+  if (analysis.internalLinksCount === 0 && analysis.totalLinks > 0) {
+  recommendations.push({
+    type: "no_internal_links",
+    severity: "Medium",
+    message: "The page does not contain any internal links.",
+    recommendation:
+      "Add relevant internal links to other pages on the same website to improve navigation and crawlability.",
+  });
+}
+
+if (analysis.linksWithoutText > 0) {
+  recommendations.push({
+    type: "links_without_text",
+    severity: "Low",
+    message: "Some links have no visible text.",
+    recommendation: "Add descriptive anchor text to help users and search engines understand the destination of each link.",
+  });
+}
+
+if (analysis.totalLinks > 150) {
+  recommendations.push({
+    type: "too_many_links",
+    severity: "Low",
+    message: "The page contains a large number of links.",
+    recommendation: "Review the links and keep only those that are useful, relevant, and helpful for users.",
+  });
+}
+
+if (
+  analysis.externalLinksCount > analysis.internalLinksCount &&
+  analysis.totalLinks > 10
+) {
+  recommendations.push({
+    type: "more_external_than_internal_links",
+    severity: "Low",
+    message: "The page contains more external links than internal links.",
+    recommendation: "Consider adding more relevant internal links to important pages on your own website.",
+  });
+}
   return recommendations;
 }
