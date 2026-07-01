@@ -22,4 +22,5 @@ model Audit {
   recommendations Json
   createdAt       DateTime @default(now())
   siteFiles       Json?
+  reachable       Boolean  @default(true)
 }

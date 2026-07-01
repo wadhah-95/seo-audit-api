@@ -7,8 +7,33 @@ export type Recommendation={
   message: string;
   recommendation: string;
 };
-export function generateRecommendations(analysis: SeoAnalysis, siteFiles: SiteFilesResult): Recommendation[]{
+
+export type PageStatus= {
+  reachable: boolean,
+  statusCode: number,
+  error?: string,
+}
+
+export function generateRecommendations(analysis: SeoAnalysis, siteFiles: SiteFilesResult, pageStatus: PageStatus): Recommendation[]{
   const recommendations: Recommendation[]=[];
+
+  if (!pageStatus.reachable) {
+  recommendations.push({
+    type: "page_not_reachable",
+    severity: "High",
+    message:
+      pageStatus.statusCode === 0
+        ? "The page could not be reached."
+        : `The page returned HTTP status code ${pageStatus.statusCode}.`,
+    recommendation:
+      pageStatus.statusCode === 0
+        ? "Check that the domain exists, the server is online, and the page is publicly accessible."
+        : "Make sure the page is publicly accessible and returns a successful 2xx HTTP status code.",
+  });
+
+  return recommendations;
+}
+  
   if (analysis.hasTitle===false) {
     recommendations.push({
       type: "missing_title",
@@ -150,5 +175,6 @@ if (
     recommendation: "Consider adding more relevant internal links to important pages on your own website.",
   });
 }
+
   return recommendations;
 }

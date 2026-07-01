@@ -523,7 +523,8 @@ export const AuditScalarFieldEnum = {
   analysis: 'analysis',
   recommendations: 'recommendations',
   createdAt: 'createdAt',
-  siteFiles: 'siteFiles'
+  siteFiles: 'siteFiles',
+  reachable: 'reachable'
 } as const
 
 export type AuditScalarFieldEnum = (typeof AuditScalarFieldEnum)[keyof typeof AuditScalarFieldEnum]
@@ -615,6 +616,13 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

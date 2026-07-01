@@ -76,7 +76,8 @@ export const AuditScalarFieldEnum = {
   analysis: 'analysis',
   recommendations: 'recommendations',
   createdAt: 'createdAt',
-  siteFiles: 'siteFiles'
+  siteFiles: 'siteFiles',
+  reachable: 'reachable'
 } as const
 
 export type AuditScalarFieldEnum = (typeof AuditScalarFieldEnum)[keyof typeof AuditScalarFieldEnum]
