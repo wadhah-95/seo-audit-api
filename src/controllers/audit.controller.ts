@@ -1,12 +1,26 @@
 import type {Request, Response} from "express";
 import { createAudit, getAuditById } from "../services/audit.service";
 import { getAllAudits } from "../services/audit.service";
+import { CreateAuditInput, createAuditSchema } from "../schemas/audit.schema";
 
 
 export async function createAuditController(req: Request, res: Response) {
   //console.log("CREATE AUDIT CONTROLLER IS RUNNING");
   try {
-    const audit=await createAudit(req.body.url)
+    const validationResult = createAuditSchema.safeParse(req.body);
+
+if (!validationResult.success) {
+  res.status(400).json({
+    success: false,
+    message: "Invalid request body",
+    error: {
+      code: "VALIDATION_ERROR",
+      details: validationResult.error.issues,
+    },
+  });
+  return;
+}
+    const audit=await createAudit(validationResult.data.url)
     //console.log("normalized url: ", url);
     //console.log("Raw url: ", req.body.url);
     
