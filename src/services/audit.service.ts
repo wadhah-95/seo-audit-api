@@ -36,10 +36,22 @@ export async function createAudit(rawUrl: string){
   return savedAudit;
 }
 
-export async function getAllAudits(){
-  const audits=await prisma.audit.findMany({
-    orderBy: {createdAt: 'asc'},
+export async function getAllAudits() {
+  const audits = await prisma.audit.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 20,
+    select: {
+      id: true,
+      url: true,
+      score: true,
+      statusCode: true,
+      reachable: true,
+      createdAt: true,
+    },
   });
+
   return audits;
 }
 export default getAllAudits();
