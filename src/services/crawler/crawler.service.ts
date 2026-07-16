@@ -71,6 +71,10 @@ export class CrawlerService {
   return internalLinks;
 }
 
+private removeDuplicates(links: string[]): string[]{
+  return [...new Set(links)];
+}
+
 }
 
 
