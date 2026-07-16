@@ -1,8 +1,14 @@
 // src/services/crawler/crawler.service.ts
 import axios from 'axios';
 import { load } from 'cheerio';
-import { normalizeUrl } from '../../utils/url.util';
+
 import { fetchHtml } from '../fetch.service';
+import { normalizeCrawlUrl } from '../../utils/url.util';
+
+export interface CrawledPage{
+  url: string;
+  depth: number;
+}
 
 export class CrawlerService {
  
@@ -75,6 +81,73 @@ private removeDuplicates(links: string[]): string[]{
   return [...new Set(links)];
 }
 
+async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promise<CrawledPage[]>{
+  const normalizedStartUrl=normalizeCrawlUrl(startUrl);
+  const queue: CrawledPage[]=[
+    {
+      url: normalizedStartUrl,
+      depth: 0,
+    }
+  ];
+  const visited= new Set<string>();
+  const crawledPages: CrawledPage[]=[];
+
+  while(queue.length>0){
+    if(crawledPages.length>=maxPages){
+      break;
+    }
+    const currentPage=queue.shift(); //FIFO
+    if(!currentPage){
+      break;
+    }
+    const{url, depth}=currentPage;
+
+    if(visited.has(url)){
+      continue;
+    }
+    visited.add(url);
+    
+
+  if (depth >= maxDepth) {
+  continue;
+    }
+
+    try{
+      const internalLinks=await this.filterInternalLinks(url);
+      crawledPages.push({
+      url,
+      depth,
+      });
+      const uniqueLinks= this.removeDuplicates(internalLinks);
+
+      for(const link of uniqueLinks){
+        const normalizedLink=normalizeCrawlUrl(link);
+        if(visited.has(normalizedLink)){
+          continue;
+        }
+
+        if (
+          queue.some(
+            page => page.url === normalizedLink
+          )
+        ) {
+          continue;
+        }
+
+        queue.push({
+          url: normalizedLink,
+          depth: depth+1
+        });
+      }
+      
+    }
+    catch {
+      continue;
+      }
+  }
+  return crawledPages;
+}
+  
 }
 
 

@@ -8,6 +8,7 @@ import prisma from "../lib/prisma";
 import { SiteFilesResult, checkSiteFiles } from "./site-files.service";
 import type { PageStatus } from "./recommendation.service";
 import type { FetchHtmlResult } from "./fetch.service";
+import { CrawlerService } from "./crawler/crawler.service";
 
 export async function createAudit(rawUrl: string){
   let normalizedUrl=normalizeUrl(rawUrl);
@@ -61,6 +62,44 @@ export async function getAuditById(id: number){
     where: {id: id},
   });
   return audit;
+}
+
+export async function createWebsiteAudit(
+  startUrl: string,
+  maxDepth: number,
+  maxPages: number
+){
+  const crawler=new CrawlerService();
+
+  const crawledPages=await crawler.crawlWebsite(
+    startUrl,
+    maxDepth,
+    maxPages
+  );
+   const audits = [];
+
+
+  for (const page of crawledPages) {
+
+    try {
+
+      const audit = await createAudit(page.url);
+
+      audits.push(audit);
+
+    } catch(error) {
+
+      console.log(
+        `Failed auditing ${page.url}`,
+        error
+      );
+
+    }
+
+  }
+
+
+  return audits;
 }
 
   

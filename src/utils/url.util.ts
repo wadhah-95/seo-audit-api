@@ -26,3 +26,32 @@ export function normalizeUrl(url: string): string{
 
   }
 
+  export function normalizeCrawlUrl(url: string): string {
+  const parsedUrl = new URL(url);
+
+  // 1. Hostnames are case-insensitive
+  parsedUrl.hostname = parsedUrl.hostname.toLowerCase();
+
+  // 2. Remove URL fragment (#section)
+  parsedUrl.hash = "";
+
+  // 3. Remove common tracking parameters
+  parsedUrl.searchParams.delete("utm_source");
+  parsedUrl.searchParams.delete("utm_medium");
+  parsedUrl.searchParams.delete("utm_campaign");
+  parsedUrl.searchParams.delete("utm_term");
+  parsedUrl.searchParams.delete("utm_content");
+  parsedUrl.searchParams.delete("fbclid");
+  parsedUrl.searchParams.delete("gclid");
+
+  // 4. Remove trailing slash (except homepage)
+  if (
+    parsedUrl.pathname.endsWith("/") &&
+    parsedUrl.pathname !== "/"
+  ) {
+    parsedUrl.pathname = parsedUrl.pathname.slice(0, -1);
+  }
+
+  return parsedUrl.toString();
+}
+
