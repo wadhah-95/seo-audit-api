@@ -1,51 +1,39 @@
+// src/services/crawler/crawler.service.ts
 import axios from 'axios';
 import { load } from 'cheerio';
+import { normalizeUrl } from '../../utils/url.util';
+import { fetchHtml } from '../fetch.service';
 
 export class CrawlerService {
-  private maxDepth = 5;
-  private visitedPages: Set<string> = new Set();
-  private delay = 1000; // Delay of 1 second between requests
-
-  async crawl(url: string, currentDepth = 0): Promise<void> {
-    if (currentDepth > this.maxDepth) return;
-
-    if (this.visitedPages.has(url)) return;
-    this.visitedPages.add(url);
-
-    try {
-      const response = await axios.get(url);
-      
-      // Handle redirects
-      if (response.status === 301 || response.status === 302) {
-        const newUrl = response.headers.location;
-        console.log(`Redirecting from ${url} to ${newUrl}`);
-        return this.crawl(newUrl, currentDepth);
-      }
-
-      const $ = load(response.data);
-      const links: string[] = [];
-
-      $('a').each((_, elem) => {
-        const href = $(elem).attr('href');
-        if (href && this.isInternalLink(href, url)) {
-          links.push(href);
-        }
-      });
-
-      for (const link of links) {
-        await this.crawl(link, currentDepth + 1);
-      }
-
-    } catch (error) {
-      console.error(`Error crawling ${url}:`, error);
-    } finally {
-      // Add a delay before the next request
-      await new Promise(resolve => setTimeout(resolve, this.delay));
+ 
+  async extractLinks(url: string): Promise<string[]>{
+    const result=await fetchHtml(url);
+    if(!result.reachable){
+      throw new Error(result.error || "Unable to fetch page. ");
     }
+    const $=load(result.html);
+    const links: string[]=[];
+
+     $("a[href]").each((_, element) => {
+      const href = $(element).attr("href");
+
+      if (!href) return;
+
+      try {
+        const absoluteUrl = new URL(href, url).href;
+        links.push(absoluteUrl);
+      } catch {
+      }
+    });
+
+    return links;
+  }
   }
 
-  private isInternalLink(href: string, baseUrl: string): boolean {
-    const resolvedUrl = new URL(href, baseUrl).href;
-    return resolvedUrl.startsWith(baseUrl);
-  }
-}
+  // 1. Instanciation
+const crawlerService = new CrawlerService();
+
+// 2. Appel de la méthode sur l'instance (Plus d'erreur !)
+const links = crawlerService.extractLinks("https://client.com");
+  
+  console.log(links);
