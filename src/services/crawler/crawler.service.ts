@@ -31,6 +31,8 @@ export class CrawlerService {
       } catch {
       }
     });
+    console.log("Extracted:", links.length);
+    console.log(links.slice(0, 20));
 
     return links;
   }
@@ -101,23 +103,31 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
       break;
     }
     const{url, depth}=currentPage;
+   
 
     if(visited.has(url)){
       continue;
     }
     visited.add(url);
     
+    crawledPages.push({
+      url,
+      depth,
+      });
 
   if (depth >= maxDepth) {
   continue;
     }
 
     try{
-      const internalLinks=await this.filterInternalLinks(url);
-      crawledPages.push({
-      url,
-      depth,
-      });
+      const internalLinks = await this.filterInternalLinks(url);
+
+
+
+
+
+
+      
       const uniqueLinks= this.removeDuplicates(internalLinks);
 
       for(const link of uniqueLinks){
@@ -134,6 +144,7 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
           continue;
         }
 
+        
         queue.push({
           url: normalizedLink,
           depth: depth+1
