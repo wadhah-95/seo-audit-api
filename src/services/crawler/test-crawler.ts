@@ -17,6 +17,8 @@ async function testCrawler() {
 
   console.log("\n===== ERRORS =====");
   console.log(JSON.stringify(result.errors, null, 2));
+
+  
 }
 
 testCrawler().catch((error) => {

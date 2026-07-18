@@ -60,6 +60,12 @@ export interface CrawledPage{
 
 export class CrawlerService {
  
+  
+  private sleep(ms: number){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+  
+  
   async extractLinks(url: string): Promise<string[]>{
     const result = await fetchHtml(url);
 
@@ -151,6 +157,11 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
   
   const normalizedStartUrl=normalizeCrawlUrl(startUrl);
   const robots = await fetchRobots(normalizedStartUrl);
+  const DEFAULT_CRAWL_DELAY = 500;
+  
+  const robotsDelay =robots.rules.find(rule => rule.userAgent === "*")?.crawlDelay;
+  const crawlDelay =robotsDelay !== undefined? robotsDelay * 1000: DEFAULT_CRAWL_DELAY;
+  console.log("Crawl delay:", crawlDelay);
   const queue: CrawledPage[]=[
     {
       url: normalizedStartUrl,
@@ -164,6 +175,7 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
   const crawlErrors: CrawlError[] = [];
   const skippedPages:CrawlSkippedPage[] = [];
 
+  let isFirstRequest = true;
   while(queue.length>0){
     if(crawledPages.length>=maxPages){
       break;
@@ -179,7 +191,7 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
     if(visited.has(url)){
       continue;
     }
-    visited.add(url);
+   
     
     
 
@@ -198,9 +210,15 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
 
     continue;
   }
+   visited.add(url);
 
-  
-      const internalLinks = await this.filterInternalLinks(url);
+    if(!isFirstRequest){
+  await this.sleep(crawlDelay);
+}
+
+isFirstRequest = false;
+    const internalLinks = await this.filterInternalLinks(url);
+    
 
       crawledPages.push({
       url,

@@ -5,6 +5,7 @@ export type RobotsRule = {
   userAgent: string;
   disallow: string[];
   allow: string[];
+  crawlDelay?: number;
 };
 
 
@@ -92,6 +93,8 @@ function parseRobots(
 
   for(const line of lines){
 
+    
+
 
     if(line.startsWith("#")){
       continue;
@@ -101,6 +104,16 @@ function parseRobots(
     const [key,value] =
       line.split(":")
       .map(x=>x.trim());
+
+  if(key.toLowerCase() === "crawl-delay"){
+
+  const delay = Number(value);
+
+  if(!isNaN(delay) && rules.length > 0){
+    rules[rules.length-1].crawlDelay = delay;
+  }
+
+}
 
 
     if(key.toLowerCase() === "user-agent"){
@@ -114,7 +127,8 @@ function parseRobots(
 
         disallow:[],
 
-        allow:[]
+        allow:[],
+        crawlDelay: undefined
 
       });
 
