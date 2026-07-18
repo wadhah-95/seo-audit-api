@@ -5,6 +5,8 @@ import { load } from 'cheerio';
 import { fetchHtml } from '../fetch.service';
 import { normalizeCrawlUrl } from '../../utils/url.util';
 
+import {fetchRobots,isAllowedByRobots} from "../robots.service";
+
 
 export type CrawlError={
   url: string,
@@ -43,6 +45,12 @@ export type CrawlResult = {
   pages: CrawledPage[];
   metrics: CrawlMetrics;
   errors: CrawlError[];
+  skipped: CrawlSkippedPage[];
+};
+
+export type CrawlSkippedPage = {
+  url:string;
+  reason:string;
 };
 
 export interface CrawledPage{
@@ -142,6 +150,7 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
   let maxDepthReached = 0;
   
   const normalizedStartUrl=normalizeCrawlUrl(startUrl);
+  const robots = await fetchRobots(normalizedStartUrl);
   const queue: CrawledPage[]=[
     {
       url: normalizedStartUrl,
@@ -153,6 +162,7 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
   const visited= new Set<string>();
   const crawledPages: CrawledPage[]=[];
   const crawlErrors: CrawlError[] = [];
+  const skippedPages:CrawlSkippedPage[] = [];
 
   while(queue.length>0){
     if(crawledPages.length>=maxPages){
@@ -178,6 +188,18 @@ async crawlWebsite(startUrl: string, maxDepth: number, maxPages: number): Promis
     }
 
     try{
+      if(!isAllowedByRobots(url,robots.rules))
+        {
+
+     skippedPages.push({
+  url,
+  reason:"ROBOTS_DISALLOW",
+});
+
+    continue;
+  }
+
+  
       const internalLinks = await this.filterInternalLinks(url);
 
       crawledPages.push({
@@ -265,6 +287,7 @@ continue;
     maxDepthReached,
   },
   errors: crawlErrors,
+  skipped: skippedPages,
 };
 }
   
