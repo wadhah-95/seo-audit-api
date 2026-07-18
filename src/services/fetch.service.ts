@@ -8,6 +8,24 @@
    */
 
 import axios from "axios";
+
+const MAX_REDIRECTS = 5;
+
+//redirect handling
+const REDIRECT_STATUS_CODES = new Set([
+  301,
+  302,
+  303,
+  307,
+  308,
+]);
+
+export type RedirectInfo = {
+  from: string;
+  to: string;
+  statusCode: number;
+};
+
 export type FetchHtmlResult = {
   html: string;
   statusCode: number;
@@ -16,7 +34,11 @@ export type FetchHtmlResult = {
 
   finalUrl: string;
 
-  redirected: boolean;
+  //redirected: boolean;
+
+  redirectCount: number;
+
+  redirectChain: RedirectInfo[];
 
   error?: string;
 
@@ -28,44 +50,154 @@ export type FetchHtmlResult = {
     | "UNKNOWN";
 };
 
-export async function fetchHtml(url: string): Promise<FetchHtmlResult> {
+export async function fetchHtml(
+  url: string
+): Promise<FetchHtmlResult> {
+
+  let currentUrl = url;
+  let redirectChain: RedirectInfo[] = [];
+  let visitedRedirects = new Set<string>(); //Store redirects to avoid redirect looping
+ 
+  
+
 
   try {
 
-    const response = await axios.get(url, {
-    timeout:10000,
+    while (true) {
+      if (visitedRedirects.has(currentUrl)) {
+  return {
+    html: "",
+    statusCode: 0,
+    reachable: false,
+    finalUrl: currentUrl,
+    redirectCount: redirectChain.length,
+    redirectChain,
+    error: "Redirect loop detected",
+    errorType: "UNKNOWN",
+  };
+}
 
-    headers:{
-      "User-Agent":"SEO-Audit-Bot/1.0"
-    },
+visitedRedirects.add(currentUrl);
 
-    maxContentLength: 2 * 1024 * 1024, // 2MB limit
-    maxBodyLength: 2 * 1024 * 1024,
+      const response = await axios.get(currentUrl, {
 
-    validateStatus:()=>true,
-});
+        timeout: 10000,
+
+        // disable axios automatic redirects
+        maxRedirects: 0,
+
+        headers: {
+          "User-Agent": "SEO-Audit-Bot/1.0"
+        },
+
+        maxContentLength: 2 * 1024 * 1024,
+        maxBodyLength: 2 * 1024 * 1024,
+
+        // Allow 3xx responses
+        validateStatus: () => true,
+
+      });
 
 
-    const finalUrl =
-      response.request?.res?.responseUrl || url;
+      
+      if (REDIRECT_STATUS_CODES.has(response.status)) {
 
 
-    return {
+        const location = response.headers.location;
 
-      html: response.data,
 
-      statusCode: response.status,
+        if (!location) {
 
-      reachable:
-        response.status >= 200 &&
-        response.status < 300,
+          return {
+            html: "",
+            statusCode: response.status,
+            reachable: false,
+            finalUrl: currentUrl,
+            redirectCount: redirectChain.length,
+            redirectChain,
+            error: "Redirect without location header",
+            errorType: "UNKNOWN",
+          };
 
-      finalUrl,
+        }
 
-      redirected:
-        finalUrl !== url,
 
-    };
+        const nextUrl = new URL(
+          location,
+          currentUrl
+        ).href;
+
+
+        redirectChain.push({
+
+          from: currentUrl,
+
+          to: nextUrl,
+
+          statusCode: response.status,
+
+        });
+
+
+        if (redirectChain.length > MAX_REDIRECTS) {
+
+          return {
+
+            html: "",
+
+            statusCode: response.status,
+
+            reachable: false,
+
+            finalUrl: currentUrl,
+
+            redirectCount: redirectChain.length,
+
+            redirectChain,
+
+            error: "Too many redirects",
+
+            errorType: "UNKNOWN",
+
+          };
+
+        }
+
+
+        currentUrl = nextUrl;
+
+        continue;
+
+      }
+
+
+      /*
+        Normal response
+      */
+
+      return {
+
+        html:
+          typeof response.data === "string"
+            ? response.data
+            : "",
+
+        statusCode: response.status,
+
+        reachable:
+          response.status >= 200 &&
+          response.status < 300,
+
+        finalUrl: currentUrl,
+
+        redirectCount: redirectChain.length,
+
+        redirectChain,
+
+      };
+
+
+    }
 
 
   } catch(error) {
@@ -73,27 +205,37 @@ export async function fetchHtml(url: string): Promise<FetchHtmlResult> {
 
     if (axios.isAxiosError(error)) {
 
+
       console.log("Axios code:", error.code);
       console.log("Axios message:", error.message);
+
 
       let errorType:
         FetchHtmlResult["errorType"] = "UNKNOWN";
 
 
-      if(error.code === "ECONNABORTED"){
+      if(error.code === "ECONNABORTED") {
+
         errorType = "TIMEOUT";
+
       }
 
-      else if(error.code === "ENOTFOUND"){
+      else if(error.code === "ENOTFOUND") {
+
         errorType = "DNS_ERROR";
+
       }
 
-      else if(error.code === "ECONNREFUSED"){
+      else if(error.code === "ECONNREFUSED") {
+
         errorType = "CONNECTION_ERROR";
+
       }
 
-      else if(error.code === "CERT_HAS_EXPIRED"){
+      else if(error.code === "CERT_HAS_EXPIRED") {
+
         errorType = "SSL_ERROR";
+
       }
 
 
@@ -104,37 +246,44 @@ export async function fetchHtml(url: string): Promise<FetchHtmlResult> {
         statusCode:
           error.response?.status ?? 0,
 
-        reachable:false,
+        reachable: false,
 
-        finalUrl:url,
+        finalUrl: currentUrl,
 
-        redirected:false,
+        redirectCount: redirectChain.length,
 
-        error:error.message,
+        redirectChain,
+
+        error: error.message,
 
         errorType,
 
       };
+
     }
 
 
     return {
 
-      html:"",
+      html: "",
 
-      statusCode:0,
+      statusCode: 0,
 
-      reachable:false,
+      reachable: false,
 
-      finalUrl:url,
+      finalUrl: currentUrl,
 
-      redirected:false,
+      redirectCount: redirectChain.length,
 
-      error:"Unknown error",
+      redirectChain,
 
-      errorType:"UNKNOWN",
+      error: "Unknown error",
+
+      errorType: "UNKNOWN",
 
     };
 
   }
 }
+
+
